@@ -1,0 +1,6 @@
+twitch.channelName=yourChannelName
+twitch.oauthuser=Yourchatbot user oauth
+twitch.id=twitch dev app id
+twitch.secret=twitch dev app secret
+
+events4j.handler.spring.enabled=true
