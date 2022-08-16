@@ -5,6 +5,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 application.properties
+package-lock.json
+webpack.generated.js
+frontend/generated/**
 
 ### STS ###
 .apt_generated
