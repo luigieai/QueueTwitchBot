@@ -1,5 +1,6 @@
 package br.dev.luigi.twitchqueue.queueduser;
 
+import br.dev.luigi.twitchqueue.TwitchqueueApplication;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,13 @@ public class QueuedService {
 
     public QueuedUser addQueuedUser(String username) {
         QueuedUser queuedUser = new QueuedUser(username);
-        return queuedUserRepo.saveAndFlush(queuedUser);
+        QueuedUser resultUser = queuedUserRepo.saveAndFlush(queuedUser);
+        TwitchqueueApplication.log.info(username + " has been added to the Queue");
+        return resultUser;
+    }
+
+    public boolean isUserQueued(String username) {
+        return queuedUserRepo.existsByUsername(username);
     }
 
     public void removeNextQueuedUsersInQueue(QueuedUser queuedUser) {

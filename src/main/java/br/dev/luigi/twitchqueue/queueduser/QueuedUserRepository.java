@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface QueuedUserRepository extends JpaRepository<QueuedUser, Long> {
 
+    boolean existsByUsername(String username);
+
 }

@@ -1,29 +1,32 @@
 package br.dev.luigi.twitchqueue.twitch;
 
-import br.dev.luigi.twitchqueue.TwitchqueueApplication;
+import br.dev.luigi.twitchqueue.queueduser.QueuedService;
 import br.dev.luigi.twitchqueue.twitch.events.QueueEventHandler;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.reactor.ReactorEventHandler;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
-@Configuration
+@Service
 public class TwitchBot {
 
-    @Value("${twitch.oauthuser}")
-    private String chatUser;
+    @Autowired
+    @Getter
+    private TwitchConfiguration configuration;
 
-    @Value("${twitch.channelName}")
-    private String channelName;
+    @Autowired
+    private QueuedService queuedService;
 
     @Bean
-    public TwitchClient getTwitchBot(){
+    @Scope("singleton")
+    public TwitchClient getBot(){
         //Builder
-        OAuth2Credential chatbotUserCredential = new OAuth2Credential("twitch", chatUser);
+        OAuth2Credential chatbotUserCredential = new OAuth2Credential("twitch", configuration.getChatUser());
         TwitchClient twitchClient = TwitchClientBuilder.builder()
                 //.withEnableHelix(true)
                 .withEnableChat(true)
@@ -32,16 +35,19 @@ public class TwitchBot {
                 .withDefaultEventHandler(ReactorEventHandler.class)
                 .build();
         //Join Channel
-        twitchClient.getChat().joinChannel(channelName);
+        twitchClient.getChat().joinChannel(configuration.getChannelName());
         //Events
-        String channelID = twitchClient.getChat().getChannelNameToChannelId().get(channelName);
+        String channelID = twitchClient.getChat().getChannelNameToChannelId().get(configuration.getChannelName());
         twitchClient.getPubSub().listenForChannelPointsRedemptionEvents(chatbotUserCredential, channelID);
-        QueueEventHandler eventHandler = new QueueEventHandler();
-        eventHandler.registerEvents(twitchClient.getEventManager());
+        QueueEventHandler queueEventHandler = new QueueEventHandler(queuedService,configuration,twitchClient);
+        queueEventHandler.registerEvents();
         //End
-        twitchClient.getChat().sendMessage(channelName, "Bot activated!");
+        twitchClient.getChat().sendMessage(configuration.getChannelName(), "Bot activated!");
         return twitchClient;
     }
 
+    public void sendMessage(String message){
+        getBot().getChat().sendMessage(configuration.getChannelName(), message);
+    }
 
 }
