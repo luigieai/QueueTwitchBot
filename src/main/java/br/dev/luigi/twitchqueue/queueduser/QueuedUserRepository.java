@@ -9,4 +9,6 @@ public interface QueuedUserRepository extends JpaRepository<QueuedUser, Long> {
 
     boolean existsByUsername(String username);
 
+    void deleteByUsername(String username);
+
 }

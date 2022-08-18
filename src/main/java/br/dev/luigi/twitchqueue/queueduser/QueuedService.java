@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,18 +36,24 @@ public class QueuedService {
     }
 
     public QueuedUser addQueuedUser(String username) {
-        QueuedUser queuedUser = new QueuedUser(username);
+        QueuedUser queuedUser = new QueuedUser(username.toLowerCase());
         QueuedUser resultUser = queuedUserRepo.saveAndFlush(queuedUser);
         TwitchqueueApplication.log.info(username + " has been added to the Queue");
         return resultUser;
     }
 
     public boolean isUserQueued(String username) {
-        return queuedUserRepo.existsByUsername(username);
+        return queuedUserRepo.existsByUsername(username.toLowerCase());
     }
 
-    public void removeNextQueuedUsersInQueue(QueuedUser queuedUser) {
+    public void removeNextQueuedUsersInQueue() {
         queuedUserRepo.deleteAll(getNextQueuedUsersInQueue());
+    }
+
+    @Transactional
+    public void removeQueuedUser(String username) {
+        queuedUserRepo.deleteByUsername(username.toLowerCase());
+        TwitchqueueApplication.log.info(username + " has been removed from the Queue");
     }
 
 }
