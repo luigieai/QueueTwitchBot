@@ -120,5 +120,20 @@ public class QueueEventHandler {
             twitchClient.getChat().sendMessage(twitchConfiguration.getChannelName(), sb.toString());
         }
 
+        if(message.equalsIgnoreCase("!queue play")) {
+            if(!isMod) {
+                TwitchqueueApplication.log.info(user + " don't have permission to cycle the queue");
+                return;
+            }
+            if(queuedService.getNextQueuedUsersInQueue().size() == 0){
+                twitchClient.getChat().sendMessage(twitchConfiguration.getChannelName(), "No users in queue");
+                return;
+            }
+
+            queuedService.playNextQueuedUsersInQueue();
+            String response = "New users will be playing now: " + queuedService.getCurrentlyPlaying();
+            twitchClient.getChat().sendMessage(twitchConfiguration.getChannelName(), response);
+        }
+
     }
 }

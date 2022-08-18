@@ -46,8 +46,16 @@ public class QueuedService {
         return queuedUserRepo.existsByUsername(username.toLowerCase());
     }
 
-    public void removeNextQueuedUsersInQueue() {
-        queuedUserRepo.deleteAll(getNextQueuedUsersInQueue());
+    @Transactional
+    public void playNextQueuedUsersInQueue() {
+        List<QueuedUser> usersToBeRemoved = getNextQueuedUsersInQueue();
+        StringBuilder sb = new StringBuilder();
+        usersToBeRemoved.stream().forEach(queuedUser -> sb.append(queuedUser.getUsername() + " "));
+
+        queuedUserRepo.deleteAll(usersToBeRemoved);
+        TwitchqueueApplication.log.info( sb.toString() + " has been removed from the Queue because they are next");
+
+        this.currentlyPlaying = sb.toString();
     }
 
     @Transactional
