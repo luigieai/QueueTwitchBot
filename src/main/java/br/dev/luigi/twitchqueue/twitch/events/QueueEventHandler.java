@@ -2,6 +2,7 @@ package br.dev.luigi.twitchqueue.twitch.events;
 
 import br.dev.luigi.twitchqueue.TwitchqueueApplication;
 import br.dev.luigi.twitchqueue.queueduser.QueuedService;
+import br.dev.luigi.twitchqueue.queueduser.QueuedUser;
 import br.dev.luigi.twitchqueue.twitch.TwitchBot;
 import br.dev.luigi.twitchqueue.twitch.TwitchConfiguration;
 import com.github.twitch4j.TwitchClient;
@@ -11,6 +12,9 @@ import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 public class QueueEventHandler {
@@ -30,8 +34,21 @@ public class QueueEventHandler {
     }
 
     private void handleMessageEvent(ChannelMessageEvent channelMessageEvent) {
-        TwitchqueueApplication.log.info(channelMessageEvent.getUser().getName()
-                + " > " + channelMessageEvent.getMessage());
+        String message = channelMessageEvent.getMessage();
+        if(!message.startsWith("!")) return;
+        if(message.equalsIgnoreCase("!queue")){
+            List<QueuedUser> users = queuedService.getAllQueuedUsers();
+            if(users.isEmpty()){
+                twitchClient.getChat().sendMessage(twitchConfiguration.getChannelName(),
+                        "The queue is empty");
+                return;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append("Queue: ");
+            users.forEach(user -> sb.append( user.getUsername() + " " ));
+            twitchClient.getChat().sendMessage(twitchConfiguration.getChannelName(), sb.toString());
+        }
+
     }
 
     private void handleChannelRedeem(RewardRedeemedEvent rewardRedeemedEvent) {

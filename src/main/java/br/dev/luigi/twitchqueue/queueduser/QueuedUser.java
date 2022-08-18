@@ -1,11 +1,13 @@
 package br.dev.luigi.twitchqueue.queueduser;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Calendar;
 
+@NoArgsConstructor
 @Entity(name="queued_user")
 public class QueuedUser {
     @Id

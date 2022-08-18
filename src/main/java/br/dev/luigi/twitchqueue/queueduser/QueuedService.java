@@ -26,7 +26,7 @@ public class QueuedService {
     }
 
     public List<QueuedUser> getAllQueuedUsers() {
-        return queuedUserRepo.findAll(Sort.by(Sort.Direction.ASC, "joined_datetime"));
+        return queuedUserRepo.findAll(Sort.by(Sort.Direction.ASC, "joinedDateTime"));
     }
 
     public List<QueuedUser> getNextQueuedUsersInQueue() {
