@@ -31,7 +31,7 @@ public class QueuedService {
     }
 
     public List<QueuedUser> getNextQueuedUsersInQueue() {
-        Page<QueuedUser> nextInQueue = queuedUserRepo.findAll(PageRequest.of(0, 2, Sort.by(Sort.Direction.ASC,"joined_datetime") ));
+        Page<QueuedUser> nextInQueue = queuedUserRepo.findAll(PageRequest.of(0, 3, Sort.by(Sort.Direction.ASC,"joinedDateTime") ));
         return nextInQueue.stream().toList();
     }
 

@@ -72,7 +72,7 @@ public class QueueEventHandler {
             twitchClient.getChat().sendMessage(twitchConfiguration.getChannelName(), sb.toString());
         }
 
-        if(message.startsWith("!queue add")) {
+        if(message.toLowerCase().startsWith("!queue add")) {
             if(!isMod) {
                 TwitchqueueApplication.log.info(user + " don't have permission to manually add user at queue");
                 return;
@@ -92,7 +92,7 @@ public class QueueEventHandler {
                     "@" + userToAdd + " had been added by " + user + " to queue to play");
         }
 
-        if(message.startsWith("!queue remove")) {
+        if(message.toLowerCase().startsWith("!queue remove")) {
             if(!isMod) {
                 TwitchqueueApplication.log.info(user + " don't have permission to manually remove user at queue");
                 return;
@@ -110,6 +110,14 @@ public class QueueEventHandler {
             queuedService.removeQueuedUser(userToRemove);
             twitchClient.getChat().sendMessage(twitchConfiguration.getChannelName(),
                     "@" + userToRemove + " had been removed from the queue by " + user);
+        }
+
+        if(message.equalsIgnoreCase("!queue next")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Next users that will play: ");
+            queuedService.getNextQueuedUsersInQueue()
+                    .stream().forEach(queuedUser -> sb.append(queuedUser.getUsername() + " ") );
+            twitchClient.getChat().sendMessage(twitchConfiguration.getChannelName(), sb.toString());
         }
 
     }
